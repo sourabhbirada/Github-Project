@@ -1,30 +1,32 @@
 const mongoose = require('mongoose');
-const {Schama} = require('mongoose');
-const { boolean, required } = require('yargs');
+const { Schema, model } = mongoose;
 
-
-
-const reposchma = new Schama({
-    reponame:{
-        type:String,
-        unique:true
+const reposchema = new Schema({
+  reponame: {
+    type: String,
+    unique: true,
+    required: true,
+  },
+  desc: {
+    type: String,
+  },
+  visibility: {
+    type: Boolean,
+    default: true,
+  },
+  files: [
+    {
+      filename: { type: String, required: true },
+      path: { type: String, required: true },
     },
-    desc: {
-        type:String
-    },
-    content: {
-        type:String
-    },
-    visibilty:{
-        type:boolean
-    },
-    owner:{
-        type: Schema.Types.ObjectId,
-        ref:"User",
-        required:true
-    }
-})
+  ],
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "User", 
+    required: true,
+  },
+});
 
-const Repo = new Model('Repo' , reposchma)
+const Repo = model("Repo", reposchema);
 
-module.exports = Repo
+module.exports = Repo;

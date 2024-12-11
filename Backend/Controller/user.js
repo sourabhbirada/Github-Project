@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcryptjs');
 const { MongoClient, ObjectId, ReturnDocument } = require('mongodb');
+const Repo = require("../models/repo");
 
 
 let client;
@@ -69,8 +70,9 @@ async function signup(req , res) {
 
         const result = await userdb.insertOne(newuser)
 
-        const token = await jwt.sign({id:result.insertId} , process.env.JWT_KEY)
-        res.json(token)
+        const token = await jwt.sign({ id: result.insertedId }, process.env.JWT_KEY);
+        console.log({ token, userId: result.insertedId });
+        res.json({ token, userId: result.insertedId });
     } catch (error) {
         console.log("Server error" , error);
         
@@ -90,7 +92,7 @@ async function getuserprofile(req , res) {
             _id:new ObjectId(userid)
         });
 
-        if(!user){
+        if(!user){   
             return res.status(400).json({ message: "User already exists" });
         }
 
@@ -101,38 +103,39 @@ async function getuserprofile(req , res) {
     
 }
 
-async function updateprfile(req , res) {
+async function updateProfile(req, res) {
     const userid = req.params.id;
-    const {email , password} = req.body
-
-    try {
-        await connectclient();
-        const db = client.db("Privgit")
-        const userdb = db.collection("users")
-
-        let updatefield = { email }
-        if(password) {
-            const salt = await bcrypt.genSalt(10)
-            const hashpassword = await bcrypt.hash(password , salt)
-            updatefield.password = hashpassword;
-        }
-
-        const result = await userdb.findOneAndUpdate({
-            _id:new ObjectId(userid)
-        },
-        {$set:updatefield} , 
-        {returnDocument:"after"});
-
-        if(!result.value){
-            return res.json({message:"not found"})
-        }
-
-        res.send(result.value)
-    } catch (error) {
-        console.log(error);   
+    const { email, username } = req.body;
+  
+    if (!email && !username) {
+      return res.status(400).json({ message: "Email or username must be provided" });
     }
-    
-}
+  
+    try {
+      await connectclient(); 
+      const db = client.db("Privgit");
+      const userdb = db.collection("users");
+  
+      const updateFields = {};
+      if (email) updateFields.email = email;
+      if (username) updateFields.username = username;
+  
+      const result = await userdb.findOneAndUpdate(
+        { _id: new ObjectId(userid) },
+        { $set: updateFields },
+        { returnDocument: "after" }
+      );
+  
+      if (!result.value) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      res.status(200).json(result.value); 
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
 
 async function deleteprofile(req , res) {
     const userid = req.params.id;
@@ -141,6 +144,8 @@ async function deleteprofile(req , res) {
         await connectclient();
         const db = client.db("Privgit")
         const userdb = db.collection("users")
+
+        await Repo.deleteMany({ owner: new ObjectId(userid) });
 
         const user = await userdb.deleteOne({
             _id:new ObjectId(userid)
@@ -178,9 +183,13 @@ async function login(req , res) {
         }
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_KEY);
+        console.log(user._id);
+        
         res.json({token , 
-            username:user.username
+            username:user.username,
+            userId:user._id
         })
+        
     } catch (error) {
         console.log("Server error" , error);
         
@@ -193,6 +202,6 @@ module.exports = {
     signup,
     login,
     getuserprofile,
-    updateprfile,
+    updateProfile,
     deleteprofile
 }
