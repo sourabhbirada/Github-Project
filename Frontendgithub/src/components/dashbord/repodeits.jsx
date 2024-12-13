@@ -47,7 +47,7 @@ const RepoDetail = () => {
     formData.append('reponame', reponame);
     formData.append('desc', desc);
     formData.append('visibility', visibility);
-    if (file) formData.append('files', file); // Attach the file if selected
+    if (file) formData.append('files', file); 
 
     try {
       const res = await axios.put(`http://localhost:3000/repo/update/${id}`, formData, {
@@ -56,8 +56,8 @@ const RepoDetail = () => {
         },
       });
       console.log('Repo updated:', res.data);
-      setRepo(res.data.data); // Update repo state with the response data
-      setIsEditing(false); // Switch off editing mode
+      setRepo(res.data.data); 
+      setIsEditing(false); 
     } catch (error) {
       console.error("Error updating repository:", error);
     }

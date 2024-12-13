@@ -45,6 +45,10 @@ const Login = () => {
     }
   };
 
+  const handelsignin =  async () => {
+    navigate('/signup')
+  }
+
   return (
     <div className="login-container">
       <form onSubmit={handleSubmit} className="login-form">
@@ -80,6 +84,11 @@ const Login = () => {
           {loading ? "Signing in..." : "Sign in"}
         </button>
       </form>
+      <div>
+        <button  onClick={handelsignin}>
+          Sign up
+        </button>
+      </div>
     </div>
   );
 };
