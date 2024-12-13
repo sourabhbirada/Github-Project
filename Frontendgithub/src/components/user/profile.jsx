@@ -20,13 +20,13 @@ const Profile = () => {
         const userId = localStorage.getItem('userId');
         
         // Fetch user details (name, email, followers)
-        const userResponse = await axios.get(`http://localhost:3000/user/${userId}`);
+        const userResponse = await axios.get(`https://github-project-k4z5.onrender.com/user/${userId}`);
         setUser(userResponse.data);
         setUsername(userResponse.data.username || userResponse.data.name); // Set name from response
         setEmail(userResponse.data.email); // Set email from response
 
         // Fetch user's repositories
-        const repoResponse = await axios.get(`http://localhost:3000/repo/user/${userId}`);
+        const repoResponse = await axios.get(`https://github-project-k4z5.onrender.com/repo/user/${userId}`);
         setRepos(repoResponse.data.repos);
         
         // Count stars for the user's repositories (assuming each repo has a 'stars' field)
@@ -34,7 +34,7 @@ const Profile = () => {
         setStars(totalStars);
 
         // Fetch followers
-        const followersResponse = await axios.get(`http://localhost:3000/followers/${userId}`);
+        const followersResponse = await axios.get(`https://github-project-k4z5.onrender.com/followers/${userId}`);
         setFollowers(followersResponse.data.followers);
         
       } catch (error) {
@@ -50,7 +50,7 @@ const Profile = () => {
     e.preventDefault();
     try {
       const userId = localStorage.getItem('userId');
-      const updateResponse = await axios.put(`http://localhost:3000/user/${userId}`, {
+      const updateResponse = await axios.put(`https://github-project-k4z5.onrender.com/user/${userId}`, {
         username,
         email
       });
@@ -72,7 +72,7 @@ const Profile = () => {
   const handleDelete = async () => {
     try {
       const userId = localStorage.getItem('userId');
-      await axios.delete(`http://localhost:3000/user/${userId}`);
+      await axios.delete(`https://github-project-k4z5.onrender.com/user/${userId}`);
       localStorage.removeItem('userId');
       localStorage.removeItem('token');
       navigate('/signup');

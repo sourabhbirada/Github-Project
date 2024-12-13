@@ -21,7 +21,7 @@ const Signup = () => {
     try {
         setLoading(true)
 
-        const res = await axios.post("http://localhost:3000/signup" , {
+        const res = await axios.post("https://github-project-k4z5.onrender.com/signup" , {
             email: email,
             password:password,
             username:username

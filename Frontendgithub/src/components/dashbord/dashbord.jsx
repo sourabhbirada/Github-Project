@@ -16,7 +16,7 @@ const Dashboard = () => {
     
     const fetchRepo = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/repo/user/${userId}`);
+        const res = await axios.get(`https://github-project-k4z5.onrender.com/repo/user/${userId}`);
         setRepo(res.data.repos);
       } catch (error) {
         console.error("Error fetching user repositories:", error);
@@ -25,7 +25,7 @@ const Dashboard = () => {
 
     const fetchAllRepo = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/repo/all`);
+        const res = await axios.get(`https://github-project-k4z5.onrender.com/repo/all`);
         setSuggestedRepo(res.data.repos);
       } catch (error) {
         console.error("Error fetching all repositories:", error);

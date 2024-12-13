@@ -50,7 +50,7 @@ const RepoDetail = () => {
     if (file) formData.append('files', file); 
 
     try {
-      const res = await axios.put(`http://localhost:3000/repo/update/${id}`, formData, {
+      const res = await axios.put(`https://github-project-k4z5.onrender.com/repo/update/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -81,7 +81,7 @@ const RepoDetail = () => {
         {repo.files && repo.files.length > 0 ? (
           repo.files.map((file, index) => (
             <li key={index}>
-              <a href={`http://localhost:3000/uploads/${file.filename}`} target="_blank" rel="noopener noreferrer">
+              <a href={`https://github-project-k4z5.onrender.com/uploads/${file.filename}`} target="_blank" rel="noopener noreferrer">
                 {file.filename}
               </a>
             </li>

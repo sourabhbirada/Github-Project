@@ -31,7 +31,7 @@ const CreateRepo = () => {
     }
   
     try {
-      const res = await axios.post('http://localhost:3000/repo/create', formData, {
+      const res = await axios.post('https://github-project-k4z5.onrender.com/repo/create', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

@@ -22,7 +22,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:3000/login", {
+      const res = await axios.post("https://github-project-k4z5.onrender.com/login", {
         email: email,
         password: password
       });
