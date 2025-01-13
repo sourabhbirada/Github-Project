@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios'; 
-import { useNavigate } from 'react-router-dom'; 
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../authcontext';
-import '../../style/login.css';
+import '../../index.css';
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { currentuser, setcurrentuser } = useAuth();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-  
   useEffect(() => {
     localStorage.removeItem("userId");
     localStorage.removeItem("token");
     setcurrentuser(null);
-  }, []); 
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -27,17 +27,13 @@ const Login = () => {
         password: password
       });
 
-      
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);
       console.log(res.data.userId);
-      
 
-      
       setcurrentuser(res.data.userId);
 
-      
-      navigate('/'); 
+      navigate('/');
 
     } catch (error) {
       console.log(error);
@@ -45,49 +41,74 @@ const Login = () => {
     }
   };
 
-  const handelsignin =  async () => {
-    navigate('/signup')
-  }
 
   return (
-    <div className="login-container">
-      <form onSubmit={handleSubmit} className="login-form">
-        <div className="input-group">
-          <label htmlFor="email">Username or email address</label>
-          <input
-            type="text"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter username or email"
-            required
-          />
+    <div className="min-h-screen flex items-center justify-center bg-zinc-900 p-4">
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold text-white">Welcome back</h1>
+          <p className="text-zinc-400 text-sm mt-2">Enter your credentials to access your account</p>
         </div>
 
-        <div className="input-group">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter password"
-            required
-          />
-        </div>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="email" className="text-sm text-zinc-400">Email</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="m@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full mt-1 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
 
-        <div className="forgot-password">
-          <a href="/forgot-password">Forgot password?</a>
-        </div>
+          <div>
+            <label htmlFor="password" className="text-sm text-zinc-400">Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full mt-1 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
 
-        <button type="submit" className="signin-btn" disabled={loading}>
-          {loading ? "Signing in..." : "Sign in"}
-        </button>
-      </form>
-      <div>
-        <button  onClick={handelsignin}>
-          Sign up
-        </button>
+          <button 
+            type="submit"
+            className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition-colors"
+          >
+            Sign in
+          </button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-zinc-700"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-zinc-900 px-2 text-zinc-500">OR CONTINUE WITH</span>
+            </div>
+          </div>
+
+          <button 
+            type="button"
+            className="w-full flex items-center justify-center gap-2 bg-zinc-800 text-white py-2 rounded-md hover:bg-zinc-700 transition-colors border border-zinc-700"
+          >
+            Continue with Google
+          </button>
+
+          <div className="text-center space-y-2">
+            <Link href="/new" className="text-sm text-indigo-400 hover:text-indigo-300">
+              Forgot your password?
+            </Link>
+            <div className="text-zinc-400 text-sm">
+              Don't have an account?{' '}
+              <Link to="/signup" className="text-indigo-400 hover:text-indigo-300">
+                Sign up
+              </Link>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   );

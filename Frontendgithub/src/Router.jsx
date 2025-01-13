@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate, useRoutes } from 'react-router-dom';
+import { Outlet, useNavigate, useRoutes } from 'react-router-dom';
 import { useAuth } from './authcontext'; 
 import Login from './components/auth/login';
 import Signup from './components/auth/signup';
@@ -8,6 +8,17 @@ import Navbar from './components/navbar';
 import CreateRepo from './components/dashbord/createrepo';
 import Profile from './components/user/profile';
 import RepoDetail from './components/dashbord/repodeits';
+
+
+const Apps = () => {
+
+  return (
+    <div>
+      <Navbar />
+      <Outlet/>
+    </div>
+  );
+}
 
 const AppRoutes = () => {
   const { currentuser, setcurrentuser } = useAuth(); 
@@ -32,38 +43,40 @@ const AppRoutes = () => {
 
   let element = useRoutes([
     {
+      path: '/',
+      element: <Apps/>,
+      children:[
+        {
+          path:'/',
+          element:<Dashboard/>
+        },
+        {
+          path:'/repo-deaits/:id',
+          element: <RepoDetail/>
+        },
+        {
+          path: '/create-repo', 
+          element: <CreateRepo />,
+        },
+        {
+          path:'/user-profile',
+          element: <Profile/>
+        }
+      ]
+    },
+    {
       path: '/login',
       element: <Login />,
     },
     {
       path: '/signup',
       element: <Signup />,
-    },
-    {
-      path: '/',
-      element: <Dashboard />,
-    },
-    {
-      path:'/repo-deaits/:id',
-      element: <RepoDetail/>
-    },
-    {
-      path: '/create-repo', 
-      element: <CreateRepo />,
-    },
-    {
-      path:'/user-profile',
-      element: <Profile/>
-    },
+    }
   ]);
 
-  return (
-    <div>
-      
-      <Navbar />
-      {element}
-    </div>
-  );
+  return element;
 };
+
+
 
 export default AppRoutes;
