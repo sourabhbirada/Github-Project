@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { CREATE_REPO } from '../../utiltis/content';
 
 const CreateRepo = () => {
   const [repoName, setRepoName] = useState('');
@@ -8,13 +9,13 @@ const CreateRepo = () => {
   const [visibility, setVisibility] = useState(true);
   const [files, setFiles] = useState([]);
   const [includeReadme, setIncludeReadme] = useState(false)
+  
   const navigate = useNavigate();
 
   const handleCreateRepo = async (e) => {
     e.preventDefault();
   
     const userId = localStorage.getItem("userId");
-    console.log("Retrieved userId from localStorage:", userId);
   
     const formData = new FormData();
     formData.append('reponame', repoName);
@@ -32,7 +33,7 @@ const CreateRepo = () => {
     }
   
     try {
-      const res = await axios.post('https://github-project-k4z5.onrender.com/repo/create', formData, {
+      const res = await axios.post(CREATE_REPO, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -42,6 +43,10 @@ const CreateRepo = () => {
     } catch (error) {
       console.error('Error creating repository:', error);
     }
+  };
+
+  const handleFileChange = (e) => {
+    setFiles(e.target.files);
   };
   
 
@@ -72,6 +77,8 @@ const CreateRepo = () => {
             <input
               type="text"
               placeholder="Repository name"
+              value={repoName}
+              onChange={(e) => setRepoName(e.target.value)}
               className="flex-1 bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500"
               required
             />
@@ -82,8 +89,19 @@ const CreateRepo = () => {
               Description <span className="text-gray-500">(optional)</span>
             </label>
             <textarea
+              value={repoDesc}
+              onChange={(e) => setRepoDesc(e.target.value)}
               className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
               rows={3}
+            />
+          </div>
+          <div className="mb-6">
+            <label className="block text-sm mb-2">Upload Files</label>
+            <input
+              type="file"
+              multiple
+              onChange={handleFileChange}
+              className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
             />
           </div>
 
@@ -153,6 +171,14 @@ const CreateRepo = () => {
                 </p>
               </div>
             </div>
+          </div>
+          <div className="mt-6">
+            <button
+              onClick={handleCreateRepo}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
+            >
+              Make Repo
+            </button>
           </div>
         </div>
       </div>

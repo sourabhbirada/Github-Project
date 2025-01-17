@@ -16,11 +16,6 @@ async function connectclient() {
     }
 }
 
-
-
-
-
-
 async function Getalluser(req , res) {
     
     try {
@@ -31,16 +26,9 @@ async function Getalluser(req , res) {
         const users = await userdb.find({}).toArray();
 
         res.json(users)
-
-
-
-
     } catch (error) {
         console.log(error);
-        
-        
-    }
-    
+    }  
 }
 
 async function signup(req , res) {

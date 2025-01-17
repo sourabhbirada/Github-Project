@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../authcontext';
 import { Link, useNavigate } from 'react-router-dom';
-import { SIGN_UP } from '../../utiltis/content';
+import {URL_MAIN } from '../../utiltis/content';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
@@ -13,13 +13,20 @@ const Signup = () => {
   const { currentuser, setcurrentuser } = useAuth();
   const navigate = useNavigate()
 
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    setLoading(true)
     try {
-        setLoading(true)
-
-        const res = await axios.post(SIGN_UP, {
+        
+        const res = await axios.post(`${URL_MAIN}/signup`, {
             email: email,
             password:password,
             username:username
@@ -94,6 +101,8 @@ const Signup = () => {
             <input
               id="confirm-password"
               type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full mt-1 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>

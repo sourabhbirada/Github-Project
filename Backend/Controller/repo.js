@@ -32,6 +32,13 @@ async function createrepo(req, res) {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
+        if (req.files && req.files.length > 0) {
+            req.files.forEach(file => {
+                console.log('Incoming file:', file.originalname);
+            });
+        } else {
+            console.log('No files received.');
+        }
         const fileData = req.files.map(file => ({
             filename: file.originalname,
             path: file.path,
@@ -45,6 +52,8 @@ async function createrepo(req, res) {
             files: fileData,
         });
 
+        console.log(fi);
+        
         const result = await newRepo.save();
 
         res.json({

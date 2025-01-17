@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 const { default: mongoose } = require('mongoose');
 const cors = require('cors');
 const http = require('http');
+
 const { Server } = require('socket.io');
 
 
@@ -13,14 +14,14 @@ dotenv.config();
 
 
 const {hideBin} = require('yargs/helpers')
-const {init} = require('./Controller/init');
-const { add } = require('./Controller/add');
-const { commit } = require('./Controller/commit');
-const { push } = require('./Controller/push');
-const { pull } = require('./Controller/pull');
+const {init} = require('./Controller/git/init');
+const { add } = require('./Controller/git/add');
+const { commit } = require('./Controller/git/commit');
+const { push } = require('./Controller/git/push');
+const { pull } = require('./Controller/git/pull');
 const userrouter = require('./Router/user')
 const reporouter = require('./Router/repo');
-const multer = require('multer');
+const gitrepo = require('./Router/feature')
 
 
 
@@ -74,6 +75,7 @@ function start() {
 
     app.use('/' , userrouter )
     app.use('/' , reporouter)
+    app.use('/feature' , gitrepo)
 
 
 

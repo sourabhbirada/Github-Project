@@ -48,7 +48,7 @@ const RepoDetail = () => {
   useEffect(() => {
     const fetchRepoDetails = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/repo/id/${id}`);
+        const res = await axios.get(`https://github-project-k4z5.onrender.com/repo/id/${id}`);
         if (res.data && res.data.data) {
           setRepo(res.data.data);
           setReponame(res.data.data.reponame);

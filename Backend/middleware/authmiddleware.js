@@ -2,15 +2,17 @@ const jwt = require('jsonwebtoken')
 
 
 function authenticatetoken(req , res, next){
-    const token =  req.headers['authorization']?.split(' ')[1];
+    const token = req.cookies?.token;
 
     if(!token){
-        return res.json({message:"no token"})
+        console.log("no token");
+        
+        return res.status(401).json({ message: "No token provided. Please log in again." });
     }
 
     jwt.verify(token , process.env.JWT_KEY , (err , user) => {
         if(err){
-            return res.json({message:"invaild token"})
+            return res.status(403).json({ message: "Invalid token. Please log in again." });
         }
 
         req.userId = user.id;

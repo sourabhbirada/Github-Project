@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../authcontext';
 import '../../index.css';
+import { URL_MAIN } from '../../utiltis/content';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -22,7 +23,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post("https://github-project-k4z5.onrender.com/login", {
+      const res = await axios.post(`${URL_MAIN}/login`, {
         email: email,
         password: password
       });
