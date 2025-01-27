@@ -1,9 +1,9 @@
 
 
 
-export const PROFILE = `http://localhost:3000/user/`;
+export const PROFILE = `https://github-project-k4z5.onrender.com/user/`;
 
-export const CREATE_REPO = 'http://localhost:3000/repo/create';
+export const CREATE_REPO = 'https://github-project-k4z5.onrender.com/repo/create';
 
 
-export const URL_MAIN = 'http://localhost:3000'
+export const URL_MAIN = 'https://github-project-k4z5.onrender.com'
