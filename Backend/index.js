@@ -15,13 +15,15 @@ dotenv.config();
 
 const {hideBin} = require('yargs/helpers')
 const {init} = require('./Controller/git/init');
-const { add } = require('./Controller/git/add');
+const { add } = require('./Controller/git/add'); 
 const { commit } = require('./Controller/git/commit');
 const { push } = require('./Controller/git/push');
 const { pull } = require('./Controller/git/pull');
 const userrouter = require('./Router/user')
 const reporouter = require('./Router/repo');
-const gitrepo = require('./Router/feature')
+const gitrepo = require('./Router/feature');
+const Errorhandling = require('./middleware/errorhandling');
+const cookieParser = require('cookie-parser');
 
 
 
@@ -61,9 +63,14 @@ function start() {
     const PORT = process.env.PORT || 3000
 
     app.use(bodyParser.json())
+    app.use(cookieParser());
     app.use(express.urlencoded({extended:true}))
     app.use(express.json())
-    app.use(cors({ origin :"*"}))
+    app.use(cors({ origin :"http://localhost:5174" , 
+        credentials:true
+    }))
+    app.use( '/uploads' , express.static('uploads'))
+    
 
     const Mongo_url = process.env.MONGODB_URL
 
@@ -76,6 +83,9 @@ function start() {
     app.use('/' , userrouter )
     app.use('/' , reporouter)
     app.use('/feature' , gitrepo)
+
+
+    app.use(Errorhandling)
 
 
 

@@ -10,7 +10,13 @@ const useUserprofile =  (userId) => {
 
     const fetchdata = async () => {
 
-        const userdata = await axios.get(PROFILE+ userId);
+        const userdata = await axios.get(PROFILE+ userId,  { headers: {
+        
+            'Content-Type': 'application/json',
+            
+          },
+          withCredentials: true
+           });
 
         setuser(userdata.data)
     }

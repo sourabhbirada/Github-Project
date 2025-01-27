@@ -10,7 +10,9 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { currentuser, setcurrentuser } = useAuth();
+  const [error , setError] = useState('')
   const navigate = useNavigate();
+
 
   useEffect(() => {
     localStorage.removeItem("userId");
@@ -21,23 +23,36 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      const res = await axios.post(`${URL_MAIN}/login`, {
+      const res = await axios.post(`${URL_MAIN}/login`,  {
         email: email,
-        password: password
-      });
-
+        password: password,
+        
+      }, { headers: {
+        
+        'Content-Type': 'application/json',
+        
+      },
+      withCredentials: true
+       });
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);
-      console.log(res.data.userId);
-
       setcurrentuser(res.data.userId);
-
       navigate('/');
-
     } catch (error) {
-      console.log(error);
+      if (axios.isAxiosError(error)) {
+        console.log(error);
+        
+        if (error.response) {
+          setError(error.response.data.message || 'An error occurred during signup.');
+        } else if (error.request) {
+          setError('No response received from server. Please try again.');
+        } else {
+          setError('An error occurred. Please try again.');
+        }
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
       setLoading(false);
     }
   };
@@ -52,6 +67,14 @@ const Login = () => {
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
+        {error && (
+            <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+              role="alert"
+            >
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
           <div>
             <label htmlFor="email" className="text-sm text-zinc-400">Email</label>
             <input
@@ -79,7 +102,7 @@ const Login = () => {
             type="submit"
             className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition-colors"
           >
-            Sign in
+            {loading?'Singing' : "Sing In"}
           </button>
 
           <div className="relative">

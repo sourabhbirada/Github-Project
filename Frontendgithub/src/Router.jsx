@@ -8,7 +8,6 @@ import Navbar from './components/navbar';
 import CreateRepo from './components/dashbord/createrepo';
 import Profile from './components/user/profile';
 import RepoDetail from './components/dashbord/repodeits';
-import Codeeitor from './components/repo/Codee';
 
 
 const Apps = () => {
@@ -60,7 +59,7 @@ const AppRoutes = () => {
           element: <CreateRepo />,
         },
         {
-          path:'/user-profile',
+          path:'/user-profile/:id',
           element: <Profile/>
         }
       ]
@@ -72,11 +71,7 @@ const AppRoutes = () => {
     {
       path: '/signup',
       element: <Signup />,
-    },
-    {
-      path:'/code',
-      element:<Codeeitor/>
-    },
+    }
   ]);
 
   return element;

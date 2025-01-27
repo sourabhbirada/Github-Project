@@ -20,7 +20,7 @@ const CreateRepo = () => {
     const formData = new FormData();
     formData.append('reponame', repoName);
     formData.append('desc', repoDesc);
-    formData.append('visibility', visibility);
+    formData.append('visibility', visibility.toString());
     formData.append('owner', userId);
   
     for (const file of files) {
@@ -34,9 +34,7 @@ const CreateRepo = () => {
   
     try {
       const res = await axios.post(CREATE_REPO, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        withCredentials:true
       });
       console.log('Repository created:', res.data);
       navigate('/');
@@ -111,8 +109,8 @@ const CreateRepo = () => {
                 type="radio"
                 id="public"
                 name="visibility"
-                checked={visibility === "public"}
-                onChange={() => setVisibility("public")}
+                checked={visibility === true}
+                onChange={() => setVisibility(true)}
                 className="mt-1"
               />
               <div>
@@ -133,8 +131,8 @@ const CreateRepo = () => {
                 type="radio"
                 id="private"
                 name="visibility"
-                checked={visibility === "private"}
-                onChange={() => setVisibility("private")}
+                checked={visibility === false}
+                onChange={() => setVisibility(false)}
                 className="mt-1"
               />
               <div>

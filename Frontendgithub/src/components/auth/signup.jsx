@@ -1,55 +1,61 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../authcontext';
 import { Link, useNavigate } from 'react-router-dom';
-import {URL_MAIN } from '../../utiltis/content';
+import { URL_MAIN } from '../../utiltis/content';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading , setLoading] = useState(false)
-  const { currentuser, setcurrentuser } = useAuth();
-  const navigate = useNavigate()
-
-
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(''); // Fixed variable name
+  const { setcurrentuser } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(''); // Clear any previous errors
 
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
+      setLoading(false);
       return;
     }
-    setLoading(true)
+
     try {
-        
-        const res = await axios.post(`${URL_MAIN}/signup`, {
-            email: email,
-            password:password,
-            username:username
-        })
-        const token = res.data.token;
-        const userId = res.data.userId;
+      const res = await axios.post(`${URL_MAIN}/signup`, {
+        email: email,
+        password: password,
+        username: username,
+      });
 
-        localStorage.setItem("token" , token)
-        localStorage.setItem('userId' , userId)
+      const token = res.data.token;
+      const userId = res.data.userId;
 
-        setcurrentuser(userId)
-        setLoading(false)
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', userId);
 
-        navigate('/')
+      setcurrentuser(userId);
+      setLoading(false);
 
+      navigate('/');
     } catch (error) {
-        console.log(error);
-        setLoading(false)
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          setError(error.response.data.error || 'An error occurred during signup.');
+        } else if (error.request) {
+          setError('No response received from server. Please try again.');
+        } else {
+          setError('An error occurred. Please try again.');
+        }
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
+      setLoading(false);
     }
-
-  
-
-    
   };
 
   return (
@@ -61,8 +67,18 @@ const Signup = () => {
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
+          {error && (
+            <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+              role="alert"
+            >
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
           <div>
-            <label htmlFor="name" className="text-sm text-zinc-400">Full Name</label>
+            <label htmlFor="name" className="text-sm text-zinc-400">
+              Full Name
+            </label>
             <input
               id="name"
               type="text"
@@ -74,7 +90,9 @@ const Signup = () => {
           </div>
 
           <div>
-            <label htmlFor="email" className="text-sm text-zinc-400">Email</label>
+            <label htmlFor="email" className="text-sm text-zinc-400">
+              Email
+            </label>
             <input
               id="email"
               type="email"
@@ -86,7 +104,9 @@ const Signup = () => {
           </div>
 
           <div>
-            <label htmlFor="password" className="text-sm text-zinc-400">Password</label>
+            <label htmlFor="password" className="text-sm text-zinc-400">
+              Password
+            </label>
             <input
               id="password"
               type="password"
@@ -97,7 +117,9 @@ const Signup = () => {
           </div>
 
           <div>
-            <label htmlFor="confirm-password" className="text-sm text-zinc-400">Confirm Password</label>
+            <label htmlFor="confirm-password" className="text-sm text-zinc-400">
+              Confirm Password
+            </label>
             <input
               id="confirm-password"
               type="password"
@@ -107,12 +129,12 @@ const Signup = () => {
             />
           </div>
 
-          <button 
+          <button
             type="submit"
             className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition-colors"
-            
+            disabled={loading} // Disable the button when loading
           >
-            Create Account
+            {loading ? 'Creating Account...' : 'Create Account'}
           </button>
 
           <div className="relative">
@@ -124,7 +146,7 @@ const Signup = () => {
             </div>
           </div>
 
-          <button 
+          <button
             type="button"
             className="w-full flex items-center justify-center gap-2 bg-zinc-800 text-white py-2 rounded-md hover:bg-zinc-700 transition-colors border border-zinc-700"
           >

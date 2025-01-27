@@ -11,7 +11,7 @@ router.get("/" , (req , res) => {
     
 })
 router.get('/api/alluserprofile' ,Getalluser )
-router.get('/user/:id' , getuserprofile)
+router.get('/user/:id',authenticatetoken, getuserprofile)
 router.post('/signup' , signup)
 router.post('/login' , login)
 router.put('/user/:id' ,authenticatetoken ,updateProfile)

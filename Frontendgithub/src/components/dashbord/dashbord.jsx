@@ -5,10 +5,10 @@ import { URL_MAIN } from '../../utiltis/content';
 import axios from 'axios';
 
 const Dashboard = () => {
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [repo, setRepo] = useState([]);
-const [suggestedRepo, setSuggestedRepo] = useState([]);
+  const [suggestedRepo, setSuggestedRepo] = useState([]);
 
 
   const [searchResult, setSearchResult] = useState([]);
@@ -20,19 +20,20 @@ const [suggestedRepo, setSuggestedRepo] = useState([]);
   ]);
 
   const userId = localStorage.getItem("userId");
-
   useEffect(() => {
     if (userId) {
       const fetchRepo = async () => {
         try {
-          const res = await fetch(`${URL_MAIN}/repo/user/${userId}`);
+          const res = await fetch(`${URL_MAIN}/repo/user/${userId}` , { withCredentials: true,
+            headers: { 'Content-Type': 'application/json' },
+            credentials: "include"
+           });
           const data = await res.json();
           setRepo(data?.repos || []);
         } catch (error) {
           console.error("Error fetching user repositories:", error);
         }
       };
-
       fetchRepo();
     }
 
@@ -45,7 +46,6 @@ const [suggestedRepo, setSuggestedRepo] = useState([]);
         console.error("Error fetching all repositories:", error);
       }
     };
-
     fetchAllRepo();
   }, [userId]);
 
@@ -53,8 +53,9 @@ const [suggestedRepo, setSuggestedRepo] = useState([]);
     try {
       const res = await axios.post(`${URL_MAIN}/feature/repo/star/${repoId}`, {
         userId
+      }, {
+        withCredentials:true
       });
-      console.log(res.data);
       alert("Repository starred successfully!");
     } catch (error) {
       console.error("Error starring repository:", error);
@@ -73,11 +74,11 @@ const [suggestedRepo, setSuggestedRepo] = useState([]);
   }, [searchQuery, repo]);
 
   const userdata = useUserprofile(userId);
+  
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
       <div className="flex">
-        {/* Left Sidebar */}
         {userId && (
           <div className="w-80 h-screen bg-gray-900 border-r border-gray-800 p-4 overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
@@ -185,24 +186,25 @@ const [suggestedRepo, setSuggestedRepo] = useState([]);
           </div>
         </div>
 
-        {/* Right Sidebar */}
+       
         {userId && (
           <div className="w-80 h-screen bg-gray-900 border-l border-gray-800 p-4 overflow-y-auto">
             <div className="mb-6">
               <div className="flex flex-col items-center p-4 bg-gray-900 rounded-lg border border-gray-800 mb-4">
                 <img
-                  src="data:image/jpeg;base64,..."
+                  src="https://gitpriv.s3.us-east-1.amazonaws.com/image.png"
                   alt="Profile"
                   className="w-20 h-20 rounded-full mb-3"
                 />
-                <h3 className="text-lg font-semibold mb-1">{userdata.username}</h3>
-                <p className="text-sm text-gray-400 mb-3">{userdata.email}</p>
+                <h3 className="text-lg font-semibold mb-1">{userdata.user?.username}</h3>
+                <p className="text-sm text-gray-400 mb-3">{userdata.user?.email}</p>
+                <Link to={`/user-profile/${userId}`}>
                 <button
-                  onClick={() => (window.location.href = '/user-profile')}
                   className="w-full px-3 py-1.5 bg-[#21262d] border border-gray-700 rounded-md hover:bg-gray-700 transition-colors text-sm mb-2"
                 >
                   Edit Profile
                 </button>
+                </Link>
                 <button
                   onClick={() => (window.location.href = '/create-repo')}
                   className="w-full px-3 py-1.5 bg-[#21262d] border border-gray-700 rounded-md hover:bg-gray-700 transition-colors text-sm"

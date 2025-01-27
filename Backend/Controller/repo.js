@@ -43,18 +43,18 @@ async function createrepo(req, res) {
             filename: file.originalname,
             path: file.path,
         }));
-
+        
         const newRepo = new Repo({
             reponame,
             desc,
-            visibility: visibility === 'true',
+            visibility: visibility,
             owner,
             files: fileData,
         });
 
-        console.log(fi);
         
-        const result = await newRepo.save();
+        
+        const result = await newRepo.save(); 
 
         res.json({
             message: "Repo created successfully with files uploaded",

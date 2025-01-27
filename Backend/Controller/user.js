@@ -31,71 +31,61 @@ async function Getalluser(req , res) {
     }  
 }
 
-async function signup(req , res) {
-    const { username , password , email} = req.body
+async function signup(req, res , next) {
+    const { username, password, email } = req.body
 
     try {
         await connectclient();
         const db = client.db("Privgit");
         const userdb = db.collection("users")
-
-        const user = await userdb.findOne({username})
-        if(user){
-            return res.status(400).json({ message: "User already exists" });
+        const user = await userdb.findOne({ $or: [{ username }, { email }] })
+        if (user) {
+            return res.status(400).json({ error: "Duplicate entry detected" });
         }
-
         const salt = await bcrypt.genSalt(10)
-        const hashpassword = await bcrypt.hash(password , salt);
-
+        const hashpassword = await bcrypt.hash(password, salt);
         const newuser = {
             username,
-            password:hashpassword,
+            password: hashpassword,
             email,
-            repositoties : [],
+            repositoties: [],
             followedusers: [],
-            starrepos:[],
+            starrepos: [],
         }
-
         const result = await userdb.insertOne(newuser)
-
         const token = await jwt.sign({ id: result.insertedId }, process.env.JWT_KEY);
-        console.log({ token, userId: result.insertedId });
-        res.json({ token, userId: result.insertedId });
+        res.status(202).json({message:"User Created", token, userId: result.insertedId});
     } catch (error) {
-        console.log("Server error" , error);
-        
+        next(error);
     }
-    
 }
 
-async function getuserprofile(req , res) {
+async function getuserprofile(req , res , next) {
     const userid = req.params.id;
-
-    try {
+    console.log(userid);
+    console.log('Cookies:', req.cookies);
+    
+    
+    try { 
         await connectclient();
         const db = client.db("Privgit")
         const userdb = db.collection("users")
-
         const user = await userdb.findOne({
             _id:new ObjectId(userid)
         });
-
         if(!user){   
             return res.status(400).json({ message: "User already exists" });
-        }
-
-        res.json(user)
+        } 
+        res.status(202).json({message:'user found' , user})
     } catch (error) {
-        console.log(error);   
+        next(error) 
     }
-    
 }
 
 async function updateProfile(req, res) {
     const userid = req.params.id;
-    const { email, username } = req.body;
-  
-    if (!email && !username) {
+    const { updatefield } = req.body;
+    if (!updatefield.email && !updatefield.username) {
       return res.status(400).json({ message: "Email or username must be provided" });
     }
   
@@ -105,20 +95,19 @@ async function updateProfile(req, res) {
       const userdb = db.collection("users");
   
       const updateFields = {};
-      if (email) updateFields.email = email;
-      if (username) updateFields.username = username;
+      if (updatefield.email) updateFields.email = updatefield.email;
+      if (updatefield.username) updateFields.username = updatefield.username;
   
       const result = await userdb.findOneAndUpdate(
         { _id: new ObjectId(userid) },
         { $set: updateFields },
         { returnDocument: "after" }
-      );
-  
-      if (!result.value) {
+      );      
+      if (!result) {
         return res.status(404).json({ message: "User not found" });
       }
   
-      res.status(200).json(result.value); 
+      res.status(200).json( {message:"User updated" , result}); 
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Internal server error" });
@@ -150,9 +139,8 @@ async function deleteprofile(req , res) {
     
 }
 
-async function login(req , res) {
+async function login(req , res , next) {
     const { password , email} = req.body
-
     try {
         await connectclient();
         const db = client.db("Privgit");
@@ -162,27 +150,20 @@ async function login(req , res) {
         if(!user){
             return res.status(400).json({ message: "User not found" });
         }
-
         const ismatch = await bcrypt.compare(password , user.password)
-
         if(!ismatch){
-            return res.json({message:"galat baat"})
-
+            return res.status(400).json({message:"galat baat"})
         }
-
         const token = jwt.sign({ id: user._id }, process.env.JWT_KEY);
-        console.log(user._id);
-        
-        res.json({token , 
+
+        res.cookie('token' , token, {
+            httpOnly: true} ).status(202).json({ message:" user found" , token , 
             username:user.username,
             userId:user._id
-        })
-        
+        }) 
     } catch (error) {
-        console.log("Server error" , error);
-        
+        next(error) 
     }
-    
 }
 
 module.exports = {
