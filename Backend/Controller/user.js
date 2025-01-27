@@ -54,7 +54,10 @@ async function signup(req, res , next) {
         }
         const result = await userdb.insertOne(newuser)
         const token = await jwt.sign({ id: result.insertedId }, process.env.JWT_KEY);
-        res.status(202).json({message:"User Created", token, userId: result.insertedId});
+        res.cookie('token' , token, {
+            httpOnly: true ,
+            secure: true,         
+            sameSite: 'none',  } ).status(202).json({message:"User Created", token, userId: result.insertedId});
     } catch (error) {
         next(error);
     }
@@ -157,7 +160,9 @@ async function login(req , res , next) {
         const token = jwt.sign({ id: user._id }, process.env.JWT_KEY);
 
         res.cookie('token' , token, {
-            httpOnly: true} ).status(202).json({ message:" user found" , token , 
+            httpOnly: true ,
+            secure: true,         
+            sameSite: 'none',  } ).status(202).json({ message:" user found" , token , 
             username:user.username,
             userId:user._id
         }) 
