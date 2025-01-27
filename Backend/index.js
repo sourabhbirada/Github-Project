@@ -66,7 +66,7 @@ function start() {
     app.use(cookieParser());
     app.use(express.urlencoded({extended:true}))
     app.use(express.json())
-    app.use(cors({ origin :"*" , 
+    app.use(cors({ origin :"https://github-project-lake.vercel.app" , 
         credentials:true
     }))
     app.use( '/uploads' , express.static('uploads'))
