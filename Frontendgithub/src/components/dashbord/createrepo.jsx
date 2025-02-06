@@ -26,7 +26,11 @@ const CreateRepo = () => {
     for (const file of files) {
       formData.append('files', file);
     }
-  
+    if (includeReadme) {
+      const defaultReadmeContent = `# ${repoName}\n\n${repoDesc || 'This is a default README file.'}`;
+      const readmeFile = new File([defaultReadmeContent], 'README.md', { type: 'text/markdown' });
+      formData.append('files', readmeFile);
+    }
     
     for (let [key, value] of formData.entries()) {
       console.log(`${key}:`, value);

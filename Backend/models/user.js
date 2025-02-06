@@ -22,12 +22,22 @@ const userschema = new Schema({
             ref: 'User', 
         },
     ],
+    following: [
+        {
+            type:Schema.Types.ObjectId,
+            ref:"User",
+        }
+    ],
     repositories: [
         {
             type: Schema.Types.ObjectId,
             ref: "Repo",
         },
     ],
+    gitusername:{
+        type:String,
+        unique:true
+    }
 });
 
 const User = model("User", userschema);

@@ -8,7 +8,7 @@ const Profile = () => {
   const [user, setUser] = useState(null)
   const [repos, setRepos] = useState([])
   const [stars, setStars] = useState(0)
-  const [starsrepo , setstarrepo] = useState([])
+  const [starsrepo, setstarrepo] = useState([])
   const [followers, setFollowers] = useState([])
   const [isEditing, setIsEditing] = useState(false)
   const [username, setUsername] = useState("")
@@ -17,8 +17,8 @@ const Profile = () => {
   const [showAllRepos, setShowAllRepos] = useState(true)
   const [showAllStars, setShowAllStars] = useState(false)
   const [showAllFollowers, setShowAllFollowers] = useState(false)
-  const [updateusername , setupdateusername] = useState(username);
-  const [updateemail , setupdateemail] = useState(email);
+  const [updateusername, setupdateusername] = useState(username);
+  const [updateemail, setupdateemail] = useState(email);
 
   const navigate = useNavigate()
   const userId = localStorage.getItem("userId")
@@ -29,11 +29,13 @@ const Profile = () => {
     const fetchUserData = async () => {
       try {
         if (userdata) {
+          console.log(userdata);
+
           setUser(userdata)
           setUsername(userdata.user.username || "")
           setEmail(userdata.user.email || "")
           setStars(userdata.user.repositories.length)
-          
+
           if (userdata.user.repositories.length > 0) {
             const repoDetails = await Promise.all(
               userdata.user.repositories.map((repoId) =>
@@ -41,24 +43,21 @@ const Profile = () => {
               )
             );
             console.log(repoDetails);
-            
-            setstarrepo(repoDetails); 
+
+            setstarrepo(repoDetails);
           }
-          if(userdata.user.followers.length > 0){
-            const followerDetails = await Promise.all(
-              userdata.user.followers.map((useID) => {
-                useUserprofile(useID);
-              })
-            )
+
+
+          if (userdata.user[0].followersDetails.length > 0) {
+            const followerDetails = userdata.user.followersDetails
             console.log(followerDetails);
-            
             setFollowers(followerDetails || 0)
           }
         }
         const repoResponse = await axios.get(`${URL_MAIN}/repo/user/${userId}`)
         setRepos(repoResponse.data.repos)
-        
-        
+
+
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response && error.response.data) {
@@ -75,24 +74,24 @@ const Profile = () => {
     }
 
     fetchUserData()
-   
+
   }, [userdata, userId])
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-     const updatefield = {}
-     if(updateusername !== username) updatefield.username = updateusername
-     if(updateemail !== email ) updatefield.email = updateemail
+    const updatefield = {}
+    if (updateusername !== username) updatefield.username = updateusername
+    if (updateemail !== email) updatefield.email = updateemail
     try {
       const res = await axios.put(`${URL_MAIN}/user/${userId}`, {
         updatefield
       }, {
-        withCredentials:true
+        withCredentials: true
       });
       console.log("Update Response:", res.data);
       if (updateusername !== username) setUsername(updateusername);
       if (updateemail !== email) setEmail(updateemail);
-      setIsEditing(false); 
+      setIsEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
     }
@@ -100,8 +99,8 @@ const Profile = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${URL_MAIN}/user/${userId}` , {
-        withCredentials:true
+      await axios.delete(`${URL_MAIN}/user/${userId}`, {
+        withCredentials: true
       })
       localStorage.removeItem("userId")
       localStorage.removeItem("token")
@@ -152,61 +151,61 @@ const Profile = () => {
               </div>
             </div>
             <div className="bg-[#161b22] rounded-lg p-6">
-                  <h2 className="text-xl font-bold mb-4 text-red-500">Danger Zone</h2>
-                  <button
-                    onClick={handleDelete}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-300"
-                  >
-                    Delete Account
-                  </button>
+              <h2 className="text-xl font-bold mb-4 text-red-500">Danger Zone</h2>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-300"
+              >
+                Delete Account
+              </button>
             </div>
             {isEditing && (
-        <div className="bg-[#161b22] rounded-lg p-6 animate-[fadeIn_0.3s_ease-out]">
-          <form onSubmit={handleUpdate} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">
-                Username
-              </label>
-              <input
-                type="text"
-                value={updateusername}
-                placeholder={username}
-                onChange={(e) => setupdateusername(e.target.value)}
-                className="w-full px-3 py-2 bg-[#0d1117] border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                value={updateemail}
-                placeholder={email}
-                onChange={(e) => setupdateemail(e.target.value)}
-                className="w-full px-3 py-2 bg-[#0d1117] border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div className="flex gap-4">
-              <button
-                type="submit"
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-300"
-              >
-                Save
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsEditing(false)}
-                className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition-colors duration-300"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+              <div className="bg-[#161b22] rounded-lg p-6 animate-[fadeIn_0.3s_ease-out]">
+                <form onSubmit={handleUpdate} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">
+                      Username
+                    </label>
+                    <input
+                      type="text"
+                      value={updateusername}
+                      placeholder={username}
+                      onChange={(e) => setupdateusername(e.target.value)}
+                      className="w-full px-3 py-2 bg-[#0d1117] border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={updateemail}
+                      placeholder={email}
+                      onChange={(e) => setupdateemail(e.target.value)}
+                      className="w-full px-3 py-2 bg-[#0d1117] border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div className="flex gap-4">
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-300"
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(false)}
+                      className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition-colors duration-300"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
           </div>
 
           <div className="md:col-span-2 space-y-6">
@@ -256,16 +255,16 @@ const Profile = () => {
                       className="bg-[#21262d] p-4 rounded-lg cursor-pointer hover:bg-[#2d333b] transition-colors duration-300"
                     >
                       <Link to={`/repo-deaits/${repo._id}`}>
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="text-blue-400 font-medium hover:underline">{repo.reponame}</h3>
-                          <p className="text-sm text-gray-400 mt-1">{repo.desc}</p>
-                        </div>
-                        <div className="flex items-center space-x-4 text-sm text-gray-400">
-                          <span>{repo.stars || 0} stars</span>
-                          <span>{repo.forks || 0} forks</span>
-                        </div>
-                      </div></Link>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h3 className="text-blue-400 font-medium hover:underline">{repo.reponame}</h3>
+                            <p className="text-sm text-gray-400 mt-1">{repo.desc}</p>
+                          </div>
+                          <div className="flex items-center space-x-4 text-sm text-gray-400">
+                            <span>{repo.stars || 0} stars</span>
+                            <span>{repo.forks || 0} forks</span>
+                          </div>
+                        </div></Link>
                     </div>
                   ))}
                 </div>
@@ -307,21 +306,22 @@ const Profile = () => {
                 <h2 className="text-xl font-bold mb-4">Followers</h2>
                 <div className="space-y-4">
                   {followers.map((follower) => (
-                    <div key={follower.id} className="bg-[#21262d] p-4 rounded-lg flex items-center space-x-4">
+                    <div key={follower._id} className="bg-[#21262d] p-4 rounded-lg flex items-center space-x-4">
                       <img
                         src={
                           follower.avatar_url ||
-                          "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EHDpqYq4MkBLDe35tokQz8UoBfZCxm.png"
+                          "https://gitpriv.s3.us-east-1.amazonaws.com/image.png"
                         }
-                        alt={follower.username}
+                        alt={follower.username || "Avatar"}
                         className="w-10 h-10 rounded-full"
                       />
-                      <p className="text-gray-200">{follower.username}</p>
+                      <p className="text-gray-200">{follower.username || "Anonymous"}</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
+
           </div>
         </div>
       </div>

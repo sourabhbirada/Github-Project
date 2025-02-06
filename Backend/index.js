@@ -66,7 +66,7 @@ function start() {
     app.use(cookieParser());
     app.use(express.urlencoded({extended:true}))
     app.use(express.json())
-    app.use(cors({ origin :"https://github-project-lake.vercel.app" , 
+    app.use(cors({ origin :"http://localhost:5173" , 
         credentials:true
     }))
     app.use( '/uploads' , express.static('uploads'))
@@ -74,13 +74,13 @@ function start() {
 
     const Mongo_url = process.env.MONGODB_URL
 
-    
+     
 
     mongoose.connect(Mongo_url , { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log("connted DB"))
                                .catch((err) => console.log(err))
 
 
-    app.use('/' , userrouter )
+    app.use('/user' , userrouter )
     app.use('/' , reporouter)
     app.use('/feature' , gitrepo)
 

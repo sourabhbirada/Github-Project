@@ -8,8 +8,7 @@ async function Starrepo(req , res) {
     const {repoId} = req.params
     const {userId} = req.body
 
-    console.log(repoId , userId);
-    console.log("starrepoing");
+
     
     
 

@@ -39,6 +39,8 @@ async function createrepo(req, res) {
         } else {
             console.log('No files received.');
         }
+
+        
         const fileData = req.files.map(file => ({
             filename: file.originalname,
             path: file.path,
@@ -87,7 +89,6 @@ async function getallrepo(req, res) {
 
 async function fetchrepobyid(req, res) {
     const { id } = req.params;  
-    console.log("Received repoId:", id);
 
     
     if (!ObjectId.isValid(id)) {
@@ -102,7 +103,6 @@ async function fetchrepobyid(req, res) {
             return res.status(404).json({ error: "Repository not found" });
         }
 
-        console.log("Fetched repo:", repo);
 
         
         res.json({
@@ -122,8 +122,9 @@ async function fetchrepobyid(req, res) {
 
 async function fetchrepobycurretnuser(req, res) {
     const { userId } = req.params; 
-    console.log(userId);
+
     
+
 
     try {
         const repos = await Repo.find({ owner: userId }).populate('owner', 'username email');
@@ -216,9 +217,6 @@ async function deleterepobyid(req, res) {
 
 
         const update = await repodb.deleteOne({ userid })
-
-
-
 
         res.json({ message: "repo deleted" })
 

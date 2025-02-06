@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require('bcryptjs');
 const { MongoClient, ObjectId, ReturnDocument } = require('mongodb');
 const Repo = require("../models/repo");
+const User = require("../models/user");
 
 
 let client;
@@ -16,7 +17,7 @@ async function connectclient() {
     }
 }
 
-async function Getalluser(req , res) {
+async function Getalluser(req , res , next) {
     
     try {
         await connectclient();
@@ -28,6 +29,7 @@ async function Getalluser(req , res) {
         res.json(users)
     } catch (error) {
         console.log(error);
+        next(error)
     }  
 }
 
@@ -65,17 +67,25 @@ async function signup(req, res , next) {
 
 async function getuserprofile(req , res , next) {
     const userid = req.params.id;
-    console.log(userid);
-    console.log('Cookies:', req.cookies);
     
     
     try { 
         await connectclient();
         const db = client.db("Privgit")
         const userdb = db.collection("users")
-        const user = await userdb.findOne({
-            _id:new ObjectId(userid)
-        });
+        const user = await userdb
+      .aggregate([
+        { $match: { _id: new ObjectId(userid) } },
+        {
+          $lookup: {
+            from: "users", 
+            localField: "followers", 
+            foreignField: "_id", 
+            as: "followersDetails", 
+          },
+        },
+      ])
+      .toArray();
         if(!user){   
             return res.status(400).json({ message: "User already exists" });
         } 
@@ -171,11 +181,72 @@ async function login(req , res , next) {
     }
 }
 
+async function Connecttogit(req , res , next){
+    const {username} = req.body
+    const {userId} = req.params
+    try {
+        await connectclient();
+        const db = client.db('Privgit')
+        const userdb = db.collection("users")
+        if(!username){
+            return res.status(400).json({message:"Username is required"})
+        }
+
+        const user = await userdb.findById(userId)
+
+        if(!user){
+            return res.status(404).json({message:"user not found"})
+        }
+
+
+
+    } catch (error) {
+        console.log(error);
+        next(error)
+    }
+}
+
+async function Newfollower(req , res , next) {
+    const follwinguser = req.params.id
+    const {userId} = req.body;
+    
+    try {
+        const finduser = await User.findById(userId);
+        
+        if(!finduser) {
+            return res.status(404).json({message:"user not found"})
+        }
+
+        const user=  await User.findById(follwinguser)
+        
+        if(!user) {
+            return res.status(404).json({message:"user not found"})
+        }
+
+        if(user.followers.includes(userId)){
+            return res.status(400).json({message:"already follow"})
+        }
+
+        
+
+        user.followers.push(userId)
+        user.save()
+        finduser.following.push(follwinguser)
+        finduser.save();
+        res.status(200).json({message:"add user to follower"})
+        
+    } catch (error) {
+        console.log(error);
+        next(error)
+    }
+}
+
 module.exports = {
     Getalluser,
     signup,
     login,
     getuserprofile,
     updateProfile,
-    deleteprofile
+    deleteprofile,
+    Newfollower
 }
